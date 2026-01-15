@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 // Types (should be in types/index.ts usually)
 type Answer = { id: string; text: string; isCorrect: boolean }
 type Question = { id: string; text: string; imageUrl?: string | null; category: string; answers: Answer[] }
-type ExamAnswer = { id: string; question: Question; selectedAnswerId: string | null; isCorrect: boolean | null }
+type ExamAnswer = { id: string; question: Question; selectedAnswerId: string | null; selectedAnswerIds: string[]; isCorrect: boolean | null }
 type ExamAttempt = { id: string; startedAt: Date; examAnswers: ExamAnswer[] }
 
 export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
@@ -20,11 +20,14 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [timeLeft, setTimeLeft] = useState(35 * 60) // 35 mins based on exam data
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [localAnswers, setLocalAnswers] = useState<Record<string, string>>({}) // examAnswerId -> answerId
+  const [localAnswers, setLocalAnswers] = useState<Record<string, string[]>>({}) // examAnswerId -> answerId[]
   const [answerFeedback, setAnswerFeedback] = useState<Record<string, boolean | null>>({}) // examAnswerId -> isCorrect
 
   const currentExamAnswer = attempt.examAnswers[currentIndex]
   const question = currentExamAnswer?.question
+  
+  // Detectar si la pregunta tiene múltiples respuestas correctas
+  const isMultipleChoice = question?.answers.filter(a => a.isCorrect).length > 1
 
   // Timer Logic
   useEffect(() => {
@@ -53,15 +56,46 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
   }
 
   const handleSelectAnswer = async (answerId: string) => {
-    if (localAnswers[currentExamAnswer.id]) return // Already answered
+    const currentAnswers = localAnswers[currentExamAnswer.id] || []
     
-    setLocalAnswers(prev => ({ ...prev, [currentExamAnswer.id]: answerId }))
-    
-    try {
+    if (isMultipleChoice) {
+      // Para preguntas de opción múltiple, permitir toggle
+      let newAnswers: string[]
+      if (currentAnswers.includes(answerId)) {
+        // Deseleccionar
+        newAnswers = currentAnswers.filter(id => id !== answerId)
+      } else {
+        // Seleccionar
+        newAnswers = [...currentAnswers, answerId]
+      }
+      
+      setLocalAnswers(prev => ({ ...prev, [currentExamAnswer.id]: newAnswers }))
+    } else {
+      // Para preguntas de una sola opción, bloquear después de responder
+      if (currentAnswers.length > 0) return // Already answered
+      
+      const newAnswers = [answerId]
+      setLocalAnswers(prev => ({ ...prev, [currentExamAnswer.id]: newAnswers }))
+      
+      // Enviar inmediatamente para preguntas simples
+      try {
         const result = await submitAnswer(currentExamAnswer.id, answerId)
         setAnswerFeedback(prev => ({ ...prev, [currentExamAnswer.id]: result.isCorrect }))
-    } catch (error) {
+      } catch (error) {
         console.error("Error submitting answer", error)
+      }
+    }
+  }
+  
+  const handleConfirmMultiple = async () => {
+    const selectedAnswers = localAnswers[currentExamAnswer.id] || []
+    if (selectedAnswers.length === 0) return
+    
+    try {
+      const result = await submitAnswer(currentExamAnswer.id, selectedAnswers)
+      setAnswerFeedback(prev => ({ ...prev, [currentExamAnswer.id]: result.isCorrect }))
+    } catch (error) {
+      console.error("Error submitting answer", error)
     }
   }
 
@@ -84,12 +118,16 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
   
   // Hydrate local state from server state (if resuming)
   useEffect(() => {
-    const initialAnswers: Record<string, string> = {}
+    const initialAnswers: Record<string, string[]> = {}
     const initialFeedback: Record<string, boolean | null> = {}
     attempt.examAnswers.forEach(ea => {
-        if (ea.selectedAnswerId) {
-            initialAnswers[ea.id] = ea.selectedAnswerId
-            initialFeedback[ea.id] = ea.isCorrect || false // Assuming non-null if selected
+        if (ea.selectedAnswerIds && ea.selectedAnswerIds.length > 0) {
+            initialAnswers[ea.id] = ea.selectedAnswerIds
+            initialFeedback[ea.id] = ea.isCorrect
+        } else if (ea.selectedAnswerId) {
+            // Compatibilidad con datos antiguos
+            initialAnswers[ea.id] = [ea.selectedAnswerId]
+            initialFeedback[ea.id] = ea.isCorrect
         }
     })
     setLocalAnswers(initialAnswers)
@@ -98,10 +136,12 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
 
   if (!question) return <div>Cargando pregunta...</div>
 
-  const isAnswered = !!localAnswers[currentExamAnswer.id]
+  const isAnswered = answerFeedback[currentExamAnswer.id] !== undefined
+  const currentSelections = localAnswers[currentExamAnswer.id] || []
   const isLastQuestion = currentIndex === attempt.examAnswers.length - 1
   const progress = ((currentIndex + 1) / attempt.examAnswers.length) * 100
   const isTimeCritical = timeLeft < 300 // 5 mins
+  const canConfirmMultiple = isMultipleChoice && currentSelections.length > 0 && !isAnswered
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col font-sans">
@@ -133,7 +173,7 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto max-w-3xl p-4 md:p-6 flex flex-col justify-center">
+      <main className="flex-1 container mx-auto max-w-3xl p-3 md:p-4 flex flex-col justify-center">
         <AnimatePresence mode="wait">
             <motion.div
                 key={question.id}
@@ -143,23 +183,23 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
                 transition={{ duration: 0.3 }}
                 className="w-full"
             >
-                <Card className="p-4 md:p-6 shadow-lg border-none bg-white/50 backdrop-blur-sm dark:bg-zinc-900/50">
-                    <div className="mb-3 flex justify-between items-start">
-                         <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                <Card className="p-3 md:p-5 shadow-lg border-none bg-white/50 backdrop-blur-sm dark:bg-zinc-900/50">
+                    <div className="mb-2 flex justify-between items-start">
+                         <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                             {question.category}
                         </span>
                     </div>
 
-                    <h2 className="text-xl md:text-2xl font-bold mb-4 leading-snug text-zinc-800 dark:text-zinc-100">
+                    <h2 className="text-lg md:text-xl font-bold mb-3 leading-tight text-zinc-800 dark:text-zinc-100">
                         {question.text}
                     </h2>
 
                     {question.imageUrl && !question.imageUrl.includes('placehold.co') && (
-                        <div className="mb-4 relative rounded-lg overflow-hidden shadow-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
+                        <div className="mb-3 relative rounded-lg overflow-hidden shadow-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
                              <img 
                                 src={question.imageUrl} 
                                 alt="Imagen de la pregunta" 
-                                className="w-full h-auto object-contain max-h-48 md:max-h-64"
+                                className="w-full h-auto object-contain max-h-40 md:max-h-52"
                                 onError={(e) => {
                                     // Ocultar imagen si falla al cargar
                                     (e.target as HTMLImageElement).style.display = 'none';
@@ -168,9 +208,17 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
                         </div>
                     )}
 
-                    <div className="space-y-2.5">
+                    {isMultipleChoice && !isAnswered && (
+                        <div className="mb-3 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                            <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">
+                                ✓ Esta pregunta tiene múltiples respuestas correctas. Selecciona todas las que apliquen.
+                            </p>
+                        </div>
+                    )}
+
+                    <div className="space-y-2">
                         {question.answers.map((answer) => {
-                            const isSelected = localAnswers[currentExamAnswer.id] === answer.id
+                            const isSelected = currentSelections.includes(answer.id)
                             const showCorrect = isAnswered && answer.isCorrect
                             const showIncorrect = isAnswered && isSelected && !answer.isCorrect
                             
@@ -178,32 +226,45 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
                                 <button
                                     key={answer.id}
                                     onClick={() => handleSelectAnswer(answer.id)}
-                                    disabled={isAnswered}
+                                    disabled={isAnswered || (!isMultipleChoice && currentSelections.length > 0)}
                                     className={cn(
-                                        "w-full text-left p-3 md:p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-between group relative overflow-hidden",
-                                        !isAnswered && "hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 border-zinc-200 dark:border-zinc-800",
-                                        isSelected && !isAnswered && "border-blue-600 bg-blue-50",
+                                        "w-full text-left p-2.5 md:p-3 rounded-lg border-2 transition-all duration-200 flex items-center justify-between group relative overflow-hidden",
+                                        !isAnswered && !isSelected && "hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 border-zinc-200 dark:border-zinc-800",
+                                        isSelected && !isAnswered && "border-blue-600 bg-blue-50 dark:bg-blue-900/10",
                                         showCorrect && "border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-500",
                                         showIncorrect && "border-red-500 bg-red-50 dark:bg-red-900/20 dark:border-red-500",
                                         isAnswered && !isSelected && !showCorrect && "opacity-50 grayscale"
                                     )}
                                 >
-                                    <span className={cn("text-base font-medium", showCorrect ? "text-green-700 dark:text-green-400" : showIncorrect ? "text-red-700 dark:text-red-400" : "text-zinc-700 dark:text-zinc-300")}>
+                                    <span className={cn("text-sm md:text-base font-medium", showCorrect ? "text-green-700 dark:text-green-400" : showIncorrect ? "text-red-700 dark:text-red-400" : "text-zinc-700 dark:text-zinc-300")}>
                                         {answer.text}
                                     </span>
                                     
-                                    {showCorrect && <CheckCircle className="w-6 h-6 text-green-600" />}
-                                    {showIncorrect && <XCircle className="w-6 h-6 text-red-600" />}
+                                    {showCorrect && <CheckCircle className="w-5 h-5 text-green-600" />}
+                                    {showIncorrect && <XCircle className="w-5 h-5 text-red-600" />}
+                                    {!isAnswered && isSelected && isMultipleChoice && (
+                                        <CheckCircle className="w-5 h-5 text-blue-600 fill-blue-600" />
+                                    )}
                                 </button>
                             )
                         })}
                     </div>
+                    
+                    {/* Botón de confirmar para preguntas múltiples */}
+                    {canConfirmMultiple && (
+                        <Button 
+                            onClick={handleConfirmMultiple}
+                            className="w-full mt-3 bg-blue-600 hover:bg-blue-700"
+                        >
+                            Confirmar {currentSelections.length} {currentSelections.length === 1 ? 'respuesta' : 'respuestas'}
+                        </Button>
+                    )}
                 </Card>
             </motion.div>
         </AnimatePresence>
 
         {/* Footer Actions */}
-        <div className="mt-4 flex justify-between items-center">
+        <div className="mt-3 flex justify-between items-center">
             <Button variant="ghost" onClick={handlePrev} disabled={currentIndex === 0 || isSubmitting} className="text-zinc-500">
                 <ArrowLeft className="w-4 h-4 mr-2" /> Anterior
             </Button>
@@ -218,7 +279,7 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
                 </Button>
             )}
         </div>        
-        <div className="mt-12 text-center text-xs text-zinc-400">
+        <div className="mt-6 text-center text-xs text-zinc-400">
             © 2026 Victor Rivas. Todos los derechos reservados.
         </div>      </main>
     </div>

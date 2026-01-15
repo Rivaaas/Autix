@@ -1,6 +1,30 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
 import { startExam } from "@/app/actions"
-import { Clock, ShieldCheck } from "lucide-react"
+import { Clock, ShieldCheck, Loader2 } from "lucide-react"
+import { useFormStatus } from "react-dom"
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  
+  return (
+    <Button 
+      size="lg" 
+      className="w-full text-lg h-14 bg-blue-600 hover:bg-blue-700 rounded-xl"
+      disabled={pending}
+    >
+      {pending ? (
+        <>
+          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+          Iniciando examen...
+        </>
+      ) : (
+        'Comenzar Ahora'
+      )}
+    </Button>
+  )
+}
 
 export default function StartExamPage() {
   return (
@@ -28,9 +52,7 @@ export default function StartExamPage() {
         </p>
 
         <form action={startExam}>
-            <Button size="lg" className="w-full text-lg h-14 bg-blue-600 hover:bg-blue-700 rounded-xl">
-                Comenzar Ahora
-            </Button>
+            <SubmitButton />
         </form>
       </div>
     </div>

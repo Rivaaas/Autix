@@ -14,7 +14,8 @@ export default async function ExamPage({ params }: { params: Promise<{ id: strin
                     include: {
                         answers: true
                     }
-                }
+                },
+                selectedAnswer: true // Incluir para compatibilidad
             }
         }
     }

@@ -42,6 +42,7 @@ model ExamAnswer {
   examAttemptId    String
   questionId       String
   selectedAnswerId String?
+  selectedAnswerIds String[]   @default([])
   isCorrect        Boolean?
   examAttempt      ExamAttempt @relation(fields: [examAttemptId], references: [id])
   question         Question    @relation(fields: [questionId], references: [id])

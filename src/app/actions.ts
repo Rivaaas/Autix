@@ -46,22 +46,42 @@ export async function startExam() {
   redirect(`/exam/${attempt.id}`)
 }
 
-export async function submitAnswer(examAnswerId: string, answerId: string) {
-    const answer = await prisma.answer.findUnique({
-        where: { id: answerId }
+export async function submitAnswer(examAnswerId: string, answerIds: string | string[]) {
+    // Normalizar a array
+    const selectedIds = Array.isArray(answerIds) ? answerIds : [answerIds]
+    
+    // Obtener la pregunta con todas sus respuestas
+    const examAnswer = await prisma.examAnswer.findUnique({
+        where: { id: examAnswerId },
+        include: {
+            question: {
+                include: { answers: true }
+            }
+        }
     })
     
-    if (!answer) throw new Error("Answer not found")
+    if (!examAnswer) throw new Error("Exam answer not found")
+    
+    // Obtener las respuestas correctas de la pregunta
+    const correctAnswerIds = examAnswer.question.answers
+        .filter(a => a.isCorrect)
+        .map(a => a.id)
+        .sort()
+    
+    // Comparar las respuestas seleccionadas con las correctas
+    const selectedSorted = [...selectedIds].sort()
+    const isCorrect = JSON.stringify(correctAnswerIds) === JSON.stringify(selectedSorted)
     
     await prisma.examAnswer.update({
         where: { id: examAnswerId },
         data: {
-            selectedAnswerId: answerId,
-            isCorrect: answer.isCorrect
+            selectedAnswerId: selectedIds[0], // Mantener compatibilidad
+            selectedAnswerIds: selectedIds,
+            isCorrect
         }
     })
     
-    return { success: true, isCorrect: answer.isCorrect }
+    return { success: true, isCorrect }
 }
 
 export async function finishExam(attemptId: string) {
