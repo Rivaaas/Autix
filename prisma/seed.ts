@@ -4,15 +4,6 @@ const prisma = new PrismaClient();
 
 const questionsData: any[] = [
   {
-    text: "El conductor de un vehículo puede sobrepasar a otro por la derecha cuando:",
-    image: null, 
-    answers: [
-        { text: "El vehículo alcanzado esté realizando o a punto de efectuar un viraje a la izquierda.", isCorrect: true },
-        { text: "El vehículo alcanzado esté realizando o a punto de efectuar un viraje a la derecha.", isCorrect: false },
-        { text: "Nunca.", isCorrect: false },
-    ]
-  },
-  {
     text: "Su veh\u00edculo se desv\u00eda hacia un lado cuando usted frena. Usted deber\u00eda:",
     image: null,
     answers: [
@@ -322,7 +313,7 @@ const questionsData: any[] = [
   },
   {
     text: "Usted va conduciendo su veh\u00edculo a 90 km/h que es la velocidad m\u00e1xima permitida en esa v\u00eda. \u00bfQu\u00e9 hace usted si a pesar de todo un veh\u00edculo desea adelantarlo?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=conduciendo+veh\u00edculo+velocidad+m\u00e1xima+permitida",
     answers: [
       {
         text: "Conduce lo m\u00e1s a la derecha posible.",
@@ -344,7 +335,7 @@ const questionsData: any[] = [
   },
   {
     text: "Usted ha comenzado a adelantar. El auto de la derecha va a aproximadamente 80 km/h. Por su espejo retrovisor usted ve otro auto que tiene intenci\u00f3n de adelantar. \u00bfQu\u00e9 hace usted?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=comenzado+adelantar+auto+derecha+aproximadamente",
     answers: [
       {
         text: "Frena ligeramente y vuelve a la pista derecha.",
@@ -366,7 +357,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfA cu\u00e1ntos metros de una esquina es lo m\u00e1s cerca que usted puede estacionar?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=cu\u00e1ntos+metros+esquina+cerca+puede",
     answers: [
       {
         text: "5 metros",
@@ -564,7 +555,7 @@ const questionsData: any[] = [
   },
   {
     text: "En una calle de una pista por sentido de tr\u00e1nsito usted se encuentra con que su pista est\u00e1 obstruida. \u00bfQu\u00e9 hace usted?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=calle+pista+sentido+tr\u00e1nsito+encuentra",
     answers: [
       {
         text: "Contin\u00faa, porque usted tiene el derecho a v\u00eda.",
@@ -630,7 +621,7 @@ const questionsData: any[] = [
   },
   {
     text: "Al ir circulando en su veh\u00edculo usted enfrenta esta se\u00f1al. \u00bfQu\u00e9 significa?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=circulando+veh\u00edculo+enfrenta+se\u00f1al+significa",
     answers: [
       {
         text: "Que usted puede conducir hasta un 10% m\u00e1s r\u00e1pido, porque la se\u00f1al es s\u00f3lo una recomendaci\u00f3n.",
@@ -652,7 +643,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfQu\u00e9 significa esta se\u00f1al?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=significa+se\u00f1al",
     answers: [
       {
         text: "Sem\u00e1foro fuera de servicio.",
@@ -696,7 +687,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfPara qu\u00e9 sirven las se\u00f1ales amarillas con forma de rombo?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=sirven+se\u00f1ales+amarillas+forma+rombo",
     answers: [
       {
         text: "Para entregar informaci\u00f3n.",
@@ -718,7 +709,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfCu\u00e1l de estas se\u00f1ales le previene que m\u00e1s adelante hay una serie de curvas?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=cu\u00e1l+se\u00f1ales+previene+adelante+serie",
     answers: [
       {
         text: "A",
@@ -740,7 +731,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfCu\u00e1l de estas se\u00f1ales le advierte la proximidad de un cruce de peatones?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=cu\u00e1l+se\u00f1ales+advierte+proximidad+cruce",
     answers: [
       {
         text: "A",
@@ -784,7 +775,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfQu\u00e9 significa esta luz de advertencia en el panel de instrumentos",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=significa+advertencia+panel+instrumentos",
     answers: [
       {
         text: "Luces neblineras.",
@@ -1048,7 +1039,7 @@ const questionsData: any[] = [
   },
   {
     text: "Usted est\u00e1 esperando en un cruce en T. El veh\u00edculo azul que se acerca desde la izquierda se\u00f1aliza a la derecha. \u00bfQu\u00e9 deber\u00eda hacer usted?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=est\u00e1+esperando+cruce+veh\u00edculo+azul",
     answers: [
       {
         text: "Avanzar acelerando a fondo.",
@@ -1070,7 +1061,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfQu\u00e9 deber\u00eda hacer el conductor del auto indicado con la flecha?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=deber\u00eda+hacer+conductor+auto+indicado",
     answers: [
       {
         text: "Hacer se\u00f1as con la mano a los peatones que est\u00e1n esperando poder cruzar.",
@@ -1092,7 +1083,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfQu\u00e9 hace usted ante esta situaci\u00f3n?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=hace+ante+situaci\u00f3n",
     answers: [
       {
         text: "Hace se\u00f1ales a los peatones para que se alejen de la calzada.",
@@ -1114,7 +1105,7 @@ const questionsData: any[] = [
   },
   {
     text: "Las fotograf\u00edas muestran una secuencia cronol\u00f3gica de im\u00e1genes. \u00bfCu\u00e1les son las 2 principales causas por las que surge esta situaci\u00f3n de peligro?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=fotograf\u00edas+muestran+secuencia+cronol\u00f3gica+im\u00e1genes",
     answers: [
       {
         text: "Por adelantar en un lugar prohibido.",
@@ -1246,7 +1237,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfDe qu\u00e9 le advierte esta se\u00f1al?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=advierte+se\u00f1al",
     answers: [
       {
         text: "De la posible presencia de escolares.",
@@ -1378,7 +1369,7 @@ const questionsData: any[] = [
   },
   {
     text: "De acuerdo a las circunstancias que se aprecian en la fotograf\u00eda, \u00bfser\u00eda correcto que el autom\u00f3vil indicado con la flecha continuara derecho ?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=acuerdo+circunstancias+aprecian+fotograf\u00eda+ser\u00eda",
     answers: [
       {
         text: "Si",
@@ -1668,7 +1659,7 @@ const questionsData: any[] = [
   },
   {
     text: "Usted desea adelantar. \u00bfCu\u00e1l o cu\u00e1les de las siguientes afirmaciones es(son) verdadera(s)?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=desea+adelantar+cu\u00e1l+cu\u00e1les+siguientes",
     answers: [
       {
         text: "El cami\u00f3n tiene la obligaci\u00f3n de correrse hacia la berma para dejarle a usted m\u00e1s espacio.",
@@ -1764,7 +1755,7 @@ const questionsData: any[] = [
   },
   {
     text: "Un bus est\u00e1 detenido en una parada delante suyo. El intermitente izquierdo del bus est\u00e1 parpadeando. \u00bfQu\u00e9 hace usted?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=est\u00e1+detenido+parada+delante+suyo",
     answers: [
       {
         text: "Hace parpadear sus luces delanteras y disminuye la velocidad.",
@@ -1874,7 +1865,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfQu\u00e9 significa la demarcaci\u00f3n de centro de calzada que muestra la figura?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=significa+demarcaci\u00f3n+centro+calzada+muestra",
     answers: [
       {
         text: "Que no puede ser traspasada por un conductor que viene por la pista A.",
@@ -2172,7 +2163,7 @@ const questionsData: any[] = [
   },
   {
     text: "En esta ocasi\u00f3n usted va conduciendo a 70 km/h. \u00bfQu\u00e9 hace usted?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=ocasi\u00f3n+conduciendo+hace",
     answers: [
       {
         text: "Frena en seco.",
@@ -2216,7 +2207,7 @@ const questionsData: any[] = [
   },
   {
     text: "Usted va conduciendo al lado de una fila de autos estacionados. De pronto ve una pelota rebotando en la calzada un poco m\u00e1s adelante. \u00bfQu\u00e9 deber\u00eda hacer usted?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=conduciendo+lado+fila+autos+estacionados",
     answers: [
       {
         text: "Continuar a la misma velocidad, tocando la bocina.",
@@ -2260,7 +2251,7 @@ const questionsData: any[] = [
   },
   {
     text: "En esta situaci\u00f3n, \u00bfa cu\u00e1les 3 riesgos debe estar usted principalmente atento?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=situaci\u00f3n+cu\u00e1les+riesgos+debe+estar",
     answers: [
       {
         text: "Al ciclista que viene en sentido contrario.",
@@ -2290,7 +2281,7 @@ const questionsData: any[] = [
   },
   {
     text: "Usted va conduciendo a 70 km/h que es la velocidad m\u00e1xima permitida en esta v\u00eda. \u00bfQu\u00e9 hace en esta situaci\u00f3n?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=conduciendo+velocidad+m\u00e1xima+permitida+hace",
     answers: [
       {
         text: "Est\u00e1 preparado para actuar ya que alguien puede salir corriendo a la calzada.",
@@ -2470,7 +2461,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfCu\u00e1ndo puede usted ingresar a un cruce en cuya calzada se han pintado franjas amarillas diagonales?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=cu\u00e1ndo+puede+ingresar+cruce+cuya",
     answers: [
       {
         text: "Siempre que el sem\u00e1foro est\u00e9 en verde.",
@@ -2680,7 +2671,7 @@ const questionsData: any[] = [
   },
   {
     text: "El auto azul circula a 70 km/h y el rojo a 90 km/h. \u00bfD\u00f3nde es m\u00e1s probable que sus conductores estimen el punto en que se producir\u00e1 el encuentro de ambos veh\u00edculos?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=auto+azul+circula+rojo+d\u00f3nde",
     answers: [
       {
         text: "El conductor del auto rojo estima que dicho punto ser\u00e1 el 3.",
@@ -2754,7 +2745,7 @@ const questionsData: any[] = [
   },
   {
     text: "Usted conduce a 90 km/h cuando la v\u00eda es obstruida sorpresivamente por un cami\u00f3n que est\u00e1 virando a la izquierda. \u00bfQu\u00e9 es lo primero que hace usted ?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=conduce+obstruida+sorpresivamente+cami\u00f3n+est\u00e1",
     answers: [
       {
         text: "Hace se\u00f1ales de luces y toca la bocina.",
@@ -2776,7 +2767,7 @@ const questionsData: any[] = [
   },
   {
     text: "En un cruce hay peatones atravesando la calle hacia la cual usted est\u00e1 virando. \u00bfQu\u00e9 hace usted?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=cruce+peatones+atravesando+calle+hacia",
     answers: [
       {
         text: "Espera permiti\u00e9ndoles que crucen.",
@@ -2864,7 +2855,7 @@ const questionsData: any[] = [
   },
   {
     text: "\u00bfQu\u00e9 debe hacer usted cuando enfrenta esta se\u00f1al?",
-    image: "/placeholder-image.png",
+    image: "https://placehold.co/600x400?text=debe+hacer+enfrenta+se\u00f1al",
     answers: [
       {
         text: "Detenerse s\u00f3lo si viene alg\u00fan veh\u00edculo por la otra v\u00eda.",

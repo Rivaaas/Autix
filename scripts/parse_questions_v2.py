@@ -20,6 +20,24 @@ def parse_questions(filename):
     image_pattern = re.compile(r'^imagen\s*$', re.IGNORECASE)
     ignore_pattern = re.compile(r'^(Anterior|Siguiente|Examen Municipal|Preguntas =|Tiempo en|Puntaje minimo|Tiempo utilizado|Marque|00:|Volver \|).*', re.IGNORECASE)
 
+    stop_words = {
+        'el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas', 'y', 'o', 'pero', 'si', 
+        'de', 'del', 'a', 'al', 'en', 'por', 'para', 'con', 'sin', 'su', 'sus', 
+        'es', 'son', 'se', 'que', 'como', 'cuando', 'donde', 'lo', 'le', 'les', 
+        'te', 'tu', 'tus', 'mi', 'mis', 'nos', 'os', 'este', 'esta', 'estos', 'estas',
+        'ese', 'esa', 'esos', 'esas', 'aquel', 'aquella', 'aquellos', 'aquellas',
+        'usted', 'ustedes', 'yo', 'tu', 'el', 'ella', 'ello', 'nosotros', 'vosotros', 'ellos',
+        'marques', 'respuesta', 'respuestas', 'correcta', 'correctas', 'siguiente', 'afirmaciones',
+        'verdadera', 'falso', 'marque', 'cual', 'cuales'
+    }
+
+    def get_keywords(text):
+        # Remove punctuation and split
+        clean_text = re.sub(r'[^\w\s]', '', text.lower())
+        words = clean_text.split()
+        keywords = [w for w in words if w not in stop_words and len(w) > 3]
+        return "+".join(keywords[:5]) # Top 5 keywords
+
     for line in lines:
         line = line.strip()
         if not line:
@@ -62,7 +80,8 @@ def parse_questions(filename):
         # Check for image
         if image_pattern.match(line):
             if current_q:
-                current_q['image'] = '/placeholder-image.png' # Placeholder
+                keywords = get_keywords(current_q['text'])
+                current_q['image'] = f'https://placehold.co/600x400?text={keywords}'
             continue
 
         # Append to question text if it's a continuation and we are inside a question and BEFORE any options

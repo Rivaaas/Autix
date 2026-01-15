@@ -4,17 +4,34 @@ import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 
 export async function startExam() {
-  const allQuestions = await prisma.question.findMany({ select: { id: true } })
+  // Obtener TODAS las preguntas únicas disponibles
+  const allQuestions = await prisma.question.findMany({ 
+    select: { id: true },
+    // Asegurarse de que solo tomamos preguntas con respuestas válidas
+    where: {
+      answers: {
+        some: {}
+      }
+    }
+  })
   
   if (allQuestions.length === 0) {
-    // Fallback logic if DB is empty for demo purposes? 
-    // Usually we should throw or redirect to an error page.
-    // For now, let's just create an empty attempt or error.
     throw new Error("No hay preguntas en la base de datos. Ejecuta el seed.")
   }
 
-  const shuffled = allQuestions.sort(() => 0.5 - Math.random())
-  const selected = shuffled.slice(0, 35)
+  if (allQuestions.length < 35) {
+    throw new Error(`Solo hay ${allQuestions.length} preguntas. Se requieren al menos 35.`)
+  }
+
+  // Selección aleatoria de Fisher-Yates (más robusta que sort random)
+  const shuffled = [...allQuestions];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  
+  // Tomar exactamente 35 preguntas aleatorias
+  const selected = shuffled.slice(0, 35);
 
   const attempt = await prisma.examAttempt.create({
     data: {
