@@ -154,16 +154,17 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
                         {question.text}
                     </h2>
 
-                    {question.imageUrl && (
-                        <div className="mb-8 relative rounded-xl overflow-hidden shadow-lg border border-zinc-200 dark:border-zinc-800">
-                             {/* Placeholder for now since we don't have real images hosted yet but the logic is ready */}
-                             <div className="bg-zinc-100 dark:bg-zinc-800 aspect-video flex items-center justify-center text-zinc-400">
-                                <span className="text-sm">Imagen Referencial: {question.imageUrl}</span>
-                             </div>
-                             {/* 
-                             The real implementation would be:
-                             <img src={question.imageUrl} alt="Imagen de la pregunta" className="w-full h-auto object-cover" /> 
-                             */}
+                    {question.imageUrl && !question.imageUrl.includes('placehold.co') && (
+                        <div className="mb-8 relative rounded-xl overflow-hidden shadow-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
+                             <img 
+                                src={question.imageUrl} 
+                                alt="Imagen de la pregunta" 
+                                className="w-full h-auto object-contain max-h-96"
+                                onError={(e) => {
+                                    // Ocultar imagen si falla al cargar
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                             />
                         </div>
                     )}
 
