@@ -133,7 +133,7 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto max-w-3xl p-4 md:p-8 flex flex-col justify-center">
+      <main className="flex-1 container mx-auto max-w-3xl p-4 md:p-6 flex flex-col justify-center">
         <AnimatePresence mode="wait">
             <motion.div
                 key={question.id}
@@ -143,23 +143,23 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
                 transition={{ duration: 0.3 }}
                 className="w-full"
             >
-                <Card className="p-6 md:p-10 shadow-lg border-none bg-white/50 backdrop-blur-sm dark:bg-zinc-900/50">
-                    <div className="mb-6 flex justify-between items-start">
+                <Card className="p-4 md:p-6 shadow-lg border-none bg-white/50 backdrop-blur-sm dark:bg-zinc-900/50">
+                    <div className="mb-3 flex justify-between items-start">
                          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                             {question.category}
                         </span>
                     </div>
 
-                    <h2 className="text-2xl md:text-3xl font-bold mb-8 leading-snug text-zinc-800 dark:text-zinc-100">
+                    <h2 className="text-xl md:text-2xl font-bold mb-4 leading-snug text-zinc-800 dark:text-zinc-100">
                         {question.text}
                     </h2>
 
                     {question.imageUrl && !question.imageUrl.includes('placehold.co') && (
-                        <div className="mb-8 relative rounded-xl overflow-hidden shadow-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
+                        <div className="mb-4 relative rounded-lg overflow-hidden shadow-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
                              <img 
                                 src={question.imageUrl} 
                                 alt="Imagen de la pregunta" 
-                                className="w-full h-auto object-contain max-h-96"
+                                className="w-full h-auto object-contain max-h-48 md:max-h-64"
                                 onError={(e) => {
                                     // Ocultar imagen si falla al cargar
                                     (e.target as HTMLImageElement).style.display = 'none';
@@ -168,7 +168,7 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
                         </div>
                     )}
 
-                    <div className="space-y-4">
+                    <div className="space-y-2.5">
                         {question.answers.map((answer) => {
                             const isSelected = localAnswers[currentExamAnswer.id] === answer.id
                             const showCorrect = isAnswered && answer.isCorrect
@@ -180,7 +180,7 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
                                     onClick={() => handleSelectAnswer(answer.id)}
                                     disabled={isAnswered}
                                     className={cn(
-                                        "w-full text-left p-5 rounded-xl border-2 transition-all duration-200 flex items-center justify-between group relative overflow-hidden",
+                                        "w-full text-left p-3 md:p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-between group relative overflow-hidden",
                                         !isAnswered && "hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 border-zinc-200 dark:border-zinc-800",
                                         isSelected && !isAnswered && "border-blue-600 bg-blue-50",
                                         showCorrect && "border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-500",
@@ -188,7 +188,7 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
                                         isAnswered && !isSelected && !showCorrect && "opacity-50 grayscale"
                                     )}
                                 >
-                                    <span className={cn("text-lg font-medium", showCorrect ? "text-green-700 dark:text-green-400" : showIncorrect ? "text-red-700 dark:text-red-400" : "text-zinc-700 dark:text-zinc-300")}>
+                                    <span className={cn("text-base font-medium", showCorrect ? "text-green-700 dark:text-green-400" : showIncorrect ? "text-red-700 dark:text-red-400" : "text-zinc-700 dark:text-zinc-300")}>
                                         {answer.text}
                                     </span>
                                     
@@ -203,7 +203,7 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
         </AnimatePresence>
 
         {/* Footer Actions */}
-        <div className="mt-8 flex justify-between items-center">
+        <div className="mt-4 flex justify-between items-center">
             <Button variant="ghost" onClick={handlePrev} disabled={currentIndex === 0 || isSubmitting} className="text-zinc-500">
                 <ArrowLeft className="w-4 h-4 mr-2" /> Anterior
             </Button>
