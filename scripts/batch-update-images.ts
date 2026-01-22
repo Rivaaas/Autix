@@ -73,6 +73,12 @@ async function batchUpdateImages() {
       }
 
       const question = questions[0];
+      if (!question) {
+        console.log(`❌ ${mapping.image} - No se pudo obtener la pregunta`);
+        errors++;
+        continue;
+      }
+      
       const imagePath = `/images/questions/${mapping.image}`;
 
       await prisma.question.update({

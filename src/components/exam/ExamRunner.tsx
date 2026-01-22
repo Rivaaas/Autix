@@ -8,6 +8,7 @@ import { submitAnswer, finishExam } from '@/app/actions'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, XCircle, Clock, AlertTriangle, ArrowRight, ArrowLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 // Types (should be in types/index.ts usually)
 type Answer = { id: string; text: string; isCorrect: boolean }
@@ -27,7 +28,7 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
   const question = currentExamAnswer?.question
   
   // Detectar si la pregunta tiene múltiples respuestas correctas
-  const isMultipleChoice = question?.answers.filter(a => a.isCorrect).length > 1
+  const isMultipleChoice = (question?.answers.filter(a => a.isCorrect).length ?? 0) > 1
 
   // Timer Logic
   useEffect(() => {
@@ -196,10 +197,13 @@ export default function ExamRunner({ attempt }: { attempt: ExamAttempt }) {
 
                     {question.imageUrl && !question.imageUrl.includes('placehold.co') && (
                         <div className="mb-3 relative rounded-lg overflow-hidden shadow-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
-                             <img 
-                                src={question.imageUrl} 
+                             <Image 
+                                src={question.imageUrl.startsWith('/') ? question.imageUrl : `/images/questions/${question.imageUrl}`}
                                 alt="Imagen de la pregunta" 
+                                width={800}
+                                height={400}
                                 className="w-full h-auto object-contain max-h-40 md:max-h-52"
+                                priority={currentIndex === 0}
                                 onError={(e) => {
                                     // Ocultar imagen si falla al cargar
                                     (e.target as HTMLImageElement).style.display = 'none';

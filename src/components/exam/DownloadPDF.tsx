@@ -89,7 +89,7 @@ export default function DownloadPDF({ attempt }: DownloadPDFProps) {
     doc.setFontSize(14)
     doc.setFont("helvetica", "bold")
     const statusText = attempt.passed ? "APROBADO" : "REPROBADO"
-    const statusColor = attempt.passed ? [0, 128, 0] : [255, 0, 0]
+    const statusColor: [number, number, number] = attempt.passed ? [0, 128, 0] : [255, 0, 0]
     doc.setTextColor(statusColor[0], statusColor[1], statusColor[2])
     doc.text(statusText, margin, yPosition)
     yPosition += 8
@@ -133,7 +133,7 @@ export default function DownloadPDF({ attempt }: DownloadPDFProps) {
       doc.setFontSize(11)
       doc.setFont("helvetica", "bold")
       const icon = isCorrect ? "✓" : "✗"
-      const iconColor = isCorrect ? [0, 128, 0] : [255, 0, 0]
+      const iconColor: [number, number, number] = isCorrect ? [0, 128, 0] : [255, 0, 0]
       doc.setTextColor(iconColor[0], iconColor[1], iconColor[2])
       doc.text(icon, margin, yPosition)
       

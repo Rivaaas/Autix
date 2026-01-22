@@ -1,10 +1,19 @@
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import ExamRunner from "../../../components/exam/ExamRunner"
+import { Suspense } from "react"
+import ExamSkeleton from "@/components/exam/ExamSkeleton"
+import type { Metadata } from "next"
 
-export default async function ExamPage({ params }: { params: Promise<{ id: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
-  
+  return {
+    title: `Examen en curso - Autix`,
+    description: 'Simulación de examen de conducir clase B en progreso',
+  }
+}
+
+async function ExamContent({ id }: { id: string }) {
   const attempt = await prisma.examAttempt.findUnique({
     where: { id },
     include: {
@@ -31,15 +40,24 @@ export default async function ExamPage({ params }: { params: Promise<{ id: strin
         for (let i = ea.question.answers.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             const temp = ea.question.answers[i];
-            ea.question.answers[i] = ea.question.answers[j];
-            ea.question.answers[j] = temp;
+            const item = ea.question.answers[j];
+            if (temp && item) {
+              ea.question.answers[i] = item;
+              ea.question.answers[j] = temp;
+            }
         }
     }
   })
 
-  // Serialize dates/etc if needed but Prisma usually returns objects Next can handle roughly, 
-  // though Date objects might warn in recent versions if passed to client directly.
-  // Next.js (App Router) can pass Dates to client components.
-  
   return <ExamRunner attempt={attempt} />
+}
+
+export default async function ExamPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  
+  return (
+    <Suspense fallback={<ExamSkeleton />}>
+      <ExamContent id={id} />
+    </Suspense>
+  )
 }

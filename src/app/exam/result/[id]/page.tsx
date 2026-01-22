@@ -4,6 +4,27 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, XCircle, Home, RotateCcw } from "lucide-react"
 import DownloadPDF from "@/components/exam/DownloadPDF"
+import type { Metadata } from "next"
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  
+  const attempt = await prisma.examAttempt.findUnique({
+    where: { id },
+    select: { passed: true, score: true }
+  })
+
+  if (!attempt) {
+    return {
+      title: 'Resultado no encontrado - Autix'
+    }
+  }
+
+  return {
+    title: `${attempt.passed ? 'Aprobado' : 'Reprobado'} - ${attempt.score}/35 - Autix`,
+    description: `Resultado del examen de conducir clase B: ${attempt.passed ? 'Aprobado' : 'Reprobado'} con ${attempt.score} respuestas correctas`,
+  }
+}
 
 export default async function ResultPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
